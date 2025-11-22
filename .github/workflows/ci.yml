@@ -1,16 +1,15 @@
 deploy:
   needs: build-and-push
   runs-on: ubuntu-latest
-
   steps:
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
+        username: ubuntu
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          docker pull milodorosario/pirtolx-api:${{ github.sha }}
-          docker stop pirtolx-api || true
-          docker rm pirtolx-api || true
-          docker run -d --name pirtolx-api -p 8000:8000 milodorosario/pirtolx-api:${{ github.sha }}
+          cd /srv/pirtolx-api
+          sudo docker pull milodorosario/pirtolx-api:latest
+          sudo docker compose down || true
+          sudo docker compose up -d --force-recreate
