@@ -2,14 +2,11 @@ name: Pirtolx API CI/CD
 
 on:
   push:
-    branches:
-      - master
+    branches: [ "master" ]
 
 jobs:
-
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -42,5 +39,5 @@ jobs:
           script: |
             cd /srv/pirtolx-api
             sudo docker pull milodorosario/pirtolx-api:${{ github.sha }}
-            sudo docker compose down || true
-            sudo docker compose up -d --force-recreate
+            sudo docker compose -f docker-compose.prod.yml down || true
+            sudo docker compose -f docker-compose.prod.yml up -d --force-recreate
