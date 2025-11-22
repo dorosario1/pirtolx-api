@@ -1,15 +1,46 @@
-deploy:
-  needs: build-and-push
-  runs-on: ubuntu-latest
-  steps:
-    - name: Deploy to VPS
-      uses: appleboy/ssh-action@v1
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ubuntu
-        key: ${{ secrets.VPS_SSH_KEY }}
-        script: |
-          cd /srv/pirtolx-api
-          sudo docker pull milodorosario/pirtolx-api:latest
-          sudo docker compose down || true
-          sudo docker compose up -d --force-recreate
+name: Pirtolx API CI/CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t milodorosario/pirtolx-api:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: |
+          docker push milodorosario/pirtolx-api:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ubuntu
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /srv/pirtolx-api
+            sudo docker pull milodorosario/pirtolx-api:${{ github.sha }}
+            sudo docker compose down || true
+            sudo docker compose up -d --force-recreate
