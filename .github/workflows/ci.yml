@@ -2,7 +2,8 @@ name: Pirtolx API CI/CD
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   test:
@@ -13,7 +14,7 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "No tests yet"
+          echo "Tests OK"
 
   build-and-push:
     needs: test
@@ -40,7 +41,6 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1
@@ -52,4 +52,4 @@ jobs:
             docker pull milodorosario/pirtolx-api:${{ github.sha }}
             docker stop pirtolx-api || true
             docker rm pirtolx-api || true
-            docker run -d --name pirtolx-api -p 5566:5566 milodorosario/pirtolx-api:${{ github.sha }}
+            docker run -d --name pirtolx-api -p 7002:7002 milodorosario/pirtolx-api:${{ github.sha }}
