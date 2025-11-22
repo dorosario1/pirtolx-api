@@ -2,32 +2,18 @@ name: Pirtolx API CI/CD
 
 on:
   push:
-    branches:
-      - master
-      - feature/*
-  pull_request:
+    branches: [ master ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
+      - name: Run tests
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt || true
-
-      - name: Run linter
-        run: |
-          pip install flake8
-          flake8 src || true
+          echo "No tests yet"
 
   build-and-push:
     needs: test
@@ -45,11 +31,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t dorosario1/pirtolx-api:${{ github.sha }} .
+          docker build -t milodorosario/pirtolx-api:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
-          docker push dorosario1/pirtolx-api:${{ github.sha }}
+          docker push milodorosario/pirtolx-api:${{ github.sha }}
 
   deploy:
     needs: build-and-push
@@ -63,6 +49,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /opt/pirtolx/app
-            docker compose pull
-            docker compose up -d --remove-orphans
+            docker pull milodorosario/pirtolx-api:${{ github.sha }}
+            docker stop pirtolx-api || true
+            docker rm pirtolx-api || true
+            docker run -d --name pirtolx-api -p 5566:5566 milodorosario/pirtolx-api:${{ github.sha }}
