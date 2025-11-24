@@ -1,11 +1,9 @@
-version: "3.8"
-
 services:
   api:
-    image: dorosario1/pirtolx-api:latest
+    image: milodorosario/pirtolx-api:latest
     container_name: pirtolx-api
     restart: always
     env_file:
       - .env
     ports:
-      - "8055:8055"
+      - "8055:8000"

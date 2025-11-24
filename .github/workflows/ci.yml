@@ -19,16 +19,17 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t milodorosario/pirtolx-api:${{ github.sha }} .
+          docker build -t milodorosario/pirtolx-api:${{ github.sha }} \
+                       -t milodorosario/pirtolx-api:latest .
 
       - name: Push Docker image
         run: |
           docker push milodorosario/pirtolx-api:${{ github.sha }}
+          docker push milodorosario/pirtolx-api:latest
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1
@@ -38,6 +39,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /srv/pirtolx-api
-            sudo docker pull milodorosario/pirtolx-api:${{ github.sha }}
+            sudo docker pull milodorosario/pirtolx-api:latest
             sudo docker compose -f docker-compose.prod.yml down || true
             sudo docker compose -f docker-compose.prod.yml up -d --force-recreate
