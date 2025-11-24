@@ -1,20 +1,20 @@
-# Pirtolx Deploy Bundle
+# Pirtolx API
 
-This bundle contains recommended production-ready files for Pirtolx API:
-- Optimized Dockerfile (multi-stage)
-- requirements.txt (with redis)
-- docker-compose.prod.yml (api + redis)
-- GitHub Actions workflow to build/push images and deploy to VPS
-- FastAPI minimal app with /health endpoint
-- Simple redis async cache module
-- bootstrap.sh to prepare VPS and start services
+![CI/CD Status](https://github.com/dorosario1/pirtolx-api/actions/workflows/cicd.yml/badge.svg)
+![CI Status](https://github.com/dorosario1/pirtolx-api/actions/workflows/ci.yml/badge.svg)
 
-**How to use**
-1. Place these files at the root of your backend repository.
-2. Ensure GitHub secrets are configured: DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, VPS_HOST, VPS_SSH_KEY.
-3. Commit & push to master → CI will build and push images, then deploy.
-4. On the VPS, run `sudo bash bootstrap.sh` to initialize.
+API backend for the PirtolX platform with AI processing, caching, and full CI/CD automation.
 
-**Notes**
-- Replace placeholders and adapt code to your real project structure.
-- This bundle intentionally doesn't include secrets.
+## Features
+- FastAPI backend
+- Redis + intelligent caching layer
+- Automated CI + CD with GitHub Actions
+- Docker containerization
+- Production deployment with nginx reverse proxy + SSL
+- Healthcheck endpoint for robust orchestration
+
+## Development
+Run locally:
+```bash
+docker-compose up --build
+
