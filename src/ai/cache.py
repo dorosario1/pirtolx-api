@@ -1,47 +1,22 @@
-import json
-from typing import Callable
-from functools import wraps
+import os
 import redis.asyncio as redis
 
-REDIS_URL = "redis://127.0.0.1:6379/0"
-redis_client = None
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 
-async def init_redis(app=None):
-    global redis_client
-    if redis_client is None:
-        redis_client = redis.from_url(REDIS_URL, decode_responses=True)
-        try:
-            await redis_client.ping()
-        except Exception as e:
-            print("Warning: Redis ping failed:", e)
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
-def make_cache_key(prefix: str, *args, **kwargs) -> str:
-    payload = {"args": args, "kwargs": kwargs}
+async def init_redis():
     try:
-        body = json.dumps(payload, sort_keys=True, default=str)
+        await redis_client.ping()
     except Exception:
-        body = str(payload)
-    return f"pirtolx:{prefix}:" + body
+        # connection will be attempted lazily by redis client on first use
+        pass
 
-def cached(prefix: str, ttl: int = 60):
-    def decorator(func: Callable):
-        @wraps(func)
+def cached(ttl=60):
+    def _decor(fn):
         async def wrapper(*args, **kwargs):
-            global redis_client
-            if redis_client is None:
-                return await func(*args, **kwargs)
-            key = make_cache_key(prefix, *args, **kwargs)
-            try:
-                cached_raw = await redis_client.get(key)
-                if cached_raw:
-                    return json.loads(cached_raw)
-            except Exception:
-                pass
-            result = await func(*args, **kwargs)
-            try:
-                await redis_client.set(key, json.dumps(result, default=str), ex=ttl)
-            except Exception:
-                pass
-            return result
+            # simplistic cache decorator placeholder
+            return await fn(*args, **kwargs)
         return wrapper
-    return decorator
+    return _decor

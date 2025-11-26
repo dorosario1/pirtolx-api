@@ -1,8 +1,8 @@
+name: Pirtolx API CI/CD
+
 on:
   push:
-    branches:
-      - master
-      - feature/ci-cd-automation
+    branches: [ "master" ]
 
 jobs:
   build-and-push:
@@ -19,7 +19,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t milodorosario/pirtolx-api:${{ github.sha }}                                -t milodorosario/pirtolx-api:latest .
+          docker build -t milodorosario/pirtolx-api:${{ github.sha }} \
+                       -t milodorosario/pirtolx-api:latest .
 
       - name: Push Docker image
         run: |
