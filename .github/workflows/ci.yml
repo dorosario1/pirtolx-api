@@ -1,8 +1,8 @@
-name: Pirtolx API CI/CD
-
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
+      - feature/ci-cd-automation
 
 jobs:
   build-and-push:
