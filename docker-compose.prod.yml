@@ -1,26 +1,20 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  pirtolx-api:
-    image: dorosario1/pirtolx-api:${GIT_SHA}
+  api:
+    image: milodorosario/pirtolx-api:latest
     container_name: pirtolx-api
-    restart: unless-stopped
-
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - redis
     ports:
-      - "8000:8000"
+      - "8055:8055"
 
-    environment:
-      - ENV=production
-
-    command: >
-      uvicorn src.main:app
-      --host 0.0.0.0
-      --port 8000
-      --workers 4
-
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 15s
-      timeout: 3s
-      retries: 5
-      start_period: 20s
+  redis:
+    image: redis:7-alpine
+    container_name: pirtolx-api-redis
+    restart: always
+    ports:
+      - "6379:6379"
