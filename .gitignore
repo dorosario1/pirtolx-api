@@ -1,2 +1,22 @@
 __pycache__/
 *.pyc
+
+# Ignore environment files
+.env
+
+# Ignore workflow backup
+.github_workflow_ci.yml
+
+# Ignore development folders
+assets/
+ci_tmp/
+
+# Deployment bundles and temp scripts
+deploy.sh
+pirtolx_deploy_bundle.zip
+pirtolx_webhook_clean.zip
+
+# Local webhook test scripts
+webhook.py
+webhook.py.backup
+
